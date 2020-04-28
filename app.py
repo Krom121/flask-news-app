@@ -1,4 +1,6 @@
+import requests
 from flask import Flask, render_template, request, flash
+from flask_sqlalchemy import SQLAlchemy
 from newsapi import NewsApiClient
 
 
@@ -36,6 +38,11 @@ def index():
 
 @app.route("/weather")
 def weather():
+
+    url = 'http://api.openweathermap.org/data/2.5/weather?q={}&units=imperial&appid=6560b436a15d6c73ed06592ef82af38a'
+    city = 'Edinburgh'
+    r = requests.get(url.format(city)).json()
+    print(r)
     return render_template("weather.html", title="Weather")
 
 
