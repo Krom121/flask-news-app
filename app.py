@@ -42,8 +42,18 @@ def weather():
     url = 'http://api.openweathermap.org/data/2.5/weather?q={}&units=imperial&appid=6560b436a15d6c73ed06592ef82af38a'
     city = 'Edinburgh'
     r = requests.get(url.format(city)).json()
-    print(r)
-    return render_template("weather.html", title="Weather")
+    # print(r) print json response to test that api is working correctly
+
+    weather = {
+        'city': city,
+        'temperature': r['main']['temp'],
+        'description': r['weather'][0]['description'],
+        'icon': r['weather'][0]['icon'],
+    }
+
+    
+
+    return render_template("weather.html", weather=weather, title="Weather")
 
 
 @app.route("/sports")
