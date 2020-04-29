@@ -9,12 +9,11 @@
     <div class="row ">
         <div class="col-md-6">
             <h2 class="text-center">Weather in your area</h2>
-            <div class="input-group mt-4 mb-3">
-                <input type="text" class="form-control" placeholder="Search Your Local Weather" aria-label="search city" aria-describedby="button-addon2">
-                <div class="input-group-append">
-                  <button class="btn btn-outline-success" type="button" id="button-addon2">Search Area</button>
-                </div>
-              </div>
+            <form class="mt-4" method="POST" >
+                <input type="text" name="city" class="form-control"  placeholder="Search For Your City">
+                <button class="btn btn-outline-success mb-4 mt-4" type="submit" id="button-addon2">Search Area</button>
+            </form>
+              {% for weather in weather_data %}
               <div class="card">
                 <div class="card-body">
                   <h5 class="card-title">{{ weather.city }}</h5>
@@ -25,6 +24,7 @@
                   <p class="card-text">{{ weather.description }}</p>
                 </div>
               </div>
+              {% endfor %}
         </div>
         <div class="col-md-6">
             <h2 class="text-center mb-4">Summary</h2>

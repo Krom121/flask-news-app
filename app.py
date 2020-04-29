@@ -29,6 +29,7 @@ def index():
     link = []
     img = []
 
+    # ilitarate over the data in api with for loop
     for i in range(len(articles)):
         myarticles = articles[i]
 
@@ -44,24 +45,39 @@ def index():
 
 
 
-@app.route("/weather")
+@app.route("/weather", methods=['GET', 'POST'])
 def weather():
+    if request.method == 'POST':
+        new_city = request.form.get('city')
+        if new_city:
+            new_city_obj = City(name=new_city)
+            db.session.add(new_city_obj)
+            db.session.commit()
+    # query database for all cities within the city table
+    cities = City.query.all()
 
     url = 'http://api.openweathermap.org/data/2.5/weather?q={}&units=imperial&appid=6560b436a15d6c73ed06592ef82af38a'
-    city = 'Edinburgh'
-    r = requests.get(url.format(city)).json()
-    # print(r) print json response to test that api is working correctly
-
-    weather = {
-        'city': city,
-        'temperature': r['main']['temp'],
-        'description': r['weather'][0]['description'],
-        'icon': r['weather'][0]['icon'],
-    }
-
     
+    # create a list to hold all the weather for all the cities
+    weather_data = []
 
-    return render_template("weather.html", weather=weather, title="Weather")
+    # ilitarate over the data in databse with for loop
+    for city in cities:
+
+
+        r = requests.get(url.format(city.name)).json()
+        # print(r) print json response to test that api is working correctly
+
+        weather = {
+            'city': city.name,
+            'temperature': r['main']['temp'],
+            'description': r['weather'][0]['description'],
+            'icon': r['weather'][0]['icon'],
+        }
+        # Append weather to weather data for weather
+        weather_data.append(weather)
+
+    return render_template("weather.html", weather_data=weather_data, title="Weather")
 
 
 @app.route("/sports")
