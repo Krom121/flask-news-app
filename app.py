@@ -6,6 +6,14 @@ from newsapi import NewsApiClient
 
 app = Flask(__name__)
 
+db = SQLAlchemy(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///weather.db'
+
+class City(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+
 
 @app.route("/")
 def index():
