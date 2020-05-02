@@ -4,15 +4,34 @@
     <h1 class="display-1 text-center text-uppercase">
         World Weather
     </h1>
-    <form class="mt-4 w-50" method="POST" >
-      <input type="text" name="city" class="form-control"  placeholder="Search For Your City">
-      <button class="btn btn-outline-success mb-4 mt-4" type="submit" id="button-addon2">Search Area</button>
-  </form>
   </div>
-  <h2 class="text-center mb-3 text-uppercase">Weather in your area</h2>
+  <section class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <form style="margin: 0 auto;" class="mt-4 w-50" method="POST" >
+          <input type="text" name="city" class="form-control form-control-lg"  placeholder="Search For Your City">
+          <button class="btn btn-outline-success btn-lg mb-4 mt-4" data-toggle="tooltip" data-placement="top" title="Add your city" type="submit" id="button-addon2">Search for your city</button>
+        </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages  %}
+            {% set message_class = 'alert-success' %}
+            {% if category == 'error' %}
+            {% set message_class = 'alert-danger' %}
+            {% endif %}
+            <div style="margin: 0 auto;" class="alert {{ message_class }} w-50 text-center lead" role="alert">
+              <strong>{{ message }}</strong>
+            </div>
+          {% endfor %}
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+  </section>
+  <h2 class="text-center mt-5 mb-3 text-uppercase">Weather in your area</h2>
 <section class="d-flex w-auto mx-auto flex-row flex-wrap">
           {% for weather in weather_data %}
-            <div class="w-25 p-2 pb-3 text-center">
+            <div class=" order-1 w-25 p-2 pb-3 text-center">
               <div class="card-body w-100">
                 <h5 class="card-title text-uppercase">{{ weather.city }}</h5>
                 <figure class="figure">
@@ -21,6 +40,9 @@
                 </figure>
                 <p class="card-text lead">{{ weather.description }}</p>
               </div>
+              <a href="{{ url_for('delete_city', name=weather.city ) }}">
+                <button type="button" class="btn btn-outline-danger" data-toggle="tooltip" data-placement="bottom" title="Delete your city">Delete</button>
+              </a>
             </div>
          
           {% endfor %}

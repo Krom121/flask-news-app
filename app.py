@@ -10,11 +10,17 @@ db = SQLAlchemy(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///weather.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'thisismysecret'
 
 class City(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
 
+
+def get_weather_data(city):
+    url = f'http://api.openweathermap.org/data/2.5/weather?q={ city }&units=imperial&appid=6560b436a15d6c73ed06592ef82af38a'
+    r = requests.get(url).json()
+    return r
 
 @app.route("/")
 def index():
@@ -48,32 +54,45 @@ def index():
 # Post route for adding cities to database
 @app.route("/weather", methods=['POST'])
 def weather_post():
-    # get the value from the from input by name 
+    err_msg = ''
+    # get the value from the from input by name city
     new_city = request.form.get('city')
     if new_city:
-        new_city_obj = City(name=new_city)
-        db.session.add(new_city_obj)
-        # save new city to database
-        db.session.commit()
+        # check if there is a duplicate city name
+        dup_city = City.query.filter_by(name=new_city).first()
+        if not dup_city:
+            # check that city exists
+            dup_city_data = get_weather_data(new_city)
+            if dup_city_data['cod'] == 200:
+                new_city_obj = City(name=new_city)
+                db.session.add(new_city_obj)
+                # save new city to database
+                db.session.commit()
+            else:
+                err_msg = 'City does not exist on earth'
+        else:
+           err_msg = 'Your City is Already Avaiable'
+
+    if err_msg:
+        flash(err_msg, 'error')
+    else:
+        flash('City added successfully') 
     return redirect(url_for('weather_get'))
 
 # get route for reciving the data from database and appending with api
+# get by default no need to put method in app.route
 @app.route("/weather")
 def weather_get():
    
     # query database for all cities within the city table
     cities = City.query.all()
 
-    url = 'http://api.openweathermap.org/data/2.5/weather?q={}&units=imperial&appid=6560b436a15d6c73ed06592ef82af38a'
-    
     # create a list to hold all the weather for all the cities
     weather_data = []
 
-    # ilitarate over the data in databse with for loop
+    # ilitarate over the city name in databse with for loop
     for city in cities:
-
-
-        r = requests.get(url.format(city.name)).json()
+        r = get_weather_data(city.name)
         # print(r) print json response to test that api is working correctly
 
         weather = {
@@ -82,10 +101,20 @@ def weather_get():
             'description': r['weather'][0]['description'],
             'icon': r['weather'][0]['icon'],
         }
-        # Append weather to weather data for weather
+        # Append city to weather data for weather
         weather_data.append(weather)
 
     return render_template("weather.html", weather_data=weather_data, title="Weather")
+
+
+# delete route for removing city from database by name
+@app.route('/delete/<name>')
+def delete_city(name):
+    city = City.query.filter_by(name=name).first()
+    db.session.delete(city)
+    db.session.commit()
+    flash(f'Successfully removed { city.name }', 'success')
+    return redirect(url_for('weather_get'))
 
 
 @app.route("/sports")
