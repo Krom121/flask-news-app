@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from newsapi import NewsApiClient
 
@@ -9,6 +9,7 @@ app = Flask(__name__)
 db = SQLAlchemy(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///weather.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 class City(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,15 +45,22 @@ def index():
     return render_template("index.html", context=mylist, title="News Feed")
 
 
+# Post route for adding cities to database
+@app.route("/weather", methods=['POST'])
+def weather_post():
+    # get the value from the from input by name 
+    new_city = request.form.get('city')
+    if new_city:
+        new_city_obj = City(name=new_city)
+        db.session.add(new_city_obj)
+        # save new city to database
+        db.session.commit()
+    return redirect(url_for('weather_get'))
 
-@app.route("/weather", methods=['GET', 'POST'])
-def weather():
-    if request.method == 'POST':
-        new_city = request.form.get('city')
-        if new_city:
-            new_city_obj = City(name=new_city)
-            db.session.add(new_city_obj)
-            db.session.commit()
+# get route for reciving the data from database and appending with api
+@app.route("/weather")
+def weather_get():
+   
     # query database for all cities within the city table
     cities = City.query.all()
 

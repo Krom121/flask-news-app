@@ -1,40 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="jumbotron">
-    <h1 class="display-1 text-center">
+    <h1 class="display-1 text-center text-uppercase">
         World Weather
     </h1>
+    <form class="mt-4 w-50" method="POST" >
+      <input type="text" name="city" class="form-control"  placeholder="Search For Your City">
+      <button class="btn btn-outline-success mb-4 mt-4" type="submit" id="button-addon2">Search Area</button>
+  </form>
   </div>
-<section class="container">
-    <div class="row ">
-        <div class="col-md-6">
-            <h2 class="text-center">Weather in your area</h2>
-            <form class="mt-4" method="POST" >
-                <input type="text" name="city" class="form-control"  placeholder="Search For Your City">
-                <button class="btn btn-outline-success mb-4 mt-4" type="submit" id="button-addon2">Search Area</button>
-            </form>
-              {% for weather in weather_data %}
-              <div class="card">
-                <div class="card-body">
-                  <h5 class="card-title">{{ weather.city }}</h5>
-                  <figure class="figure">
-                    <img src="http://openweathermap.org/img/w/{{ weather.icon }}.png" class="figure-img img-fluid rounded" alt="Weather Icon">
-                    <figcaption class="figure-caption">{{ weather.temperature }}</figcaption>
-                  </figure>
-                  <p class="card-text">{{ weather.description }}</p>
-                </div>
+  <h2 class="text-center mb-3 text-uppercase">Weather in your area</h2>
+<section class="d-flex w-auto mx-auto flex-row flex-wrap">
+          {% for weather in weather_data %}
+            <div class="w-25 p-2 pb-3 text-center">
+              <div class="card-body w-100">
+                <h5 class="card-title text-uppercase">{{ weather.city }}</h5>
+                <figure class="figure">
+                    <img src="http://openweathermap.org/img/w/{{ weather.icon }}.png" class="figure-img img-fluid w-100" alt="Weather Icon">
+                    <figcaption class="figure-caption">{{ weather.temperature }} F</figcaption>
+                </figure>
+                <p class="card-text lead">{{ weather.description }}</p>
               </div>
-              {% endfor %}
-        </div>
-        <div class="col-md-6">
-            <h2 class="text-center mb-4">Summary</h2>
-            <div class="d-flex justify-content-center" id="openweathermap-widget-5"></div>
-            <script>window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = [];  window.myWidgetParam.push({id: 5,cityid: '2643743',appid: '5cb9ee36fb67bfb0f02a55cc6c16f165',units: 'metric',containerid: 'openweathermap-widget-5',  });  
-            (function() {var script = document.createElement('script');script.async = true;script.charset = "utf-8";
-            script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js";
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(script, s);  })();
-            </script>
+            </div>
+         
+          {% endfor %}
 </section>
 {% endblock content %}
 
