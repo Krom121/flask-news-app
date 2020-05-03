@@ -22,12 +22,14 @@ def get_weather_data(city):
     r = requests.get(url).json()
     return r
 
+
+# Init api for news headlines
+newsapi = NewsApiClient(api_key='b855866438b64269ba90a58a73b28673')
+
 @app.route("/")
 def index():
-    # Init api
-    newsapi = NewsApiClient(api_key='b855866438b64269ba90a58a73b28673')
-    
-    top_headlines = newsapi.get_top_headlines(sources='bbc-news, cnn, fox-news')
+    #add sources from api
+    top_headlines = newsapi.get_top_headlines(sources='bbc-news, cnn, fox-news, reuters, usa-today')
 
     articles = top_headlines['articles']
     desc = []
@@ -119,7 +121,29 @@ def delete_city(name):
 
 @app.route("/sports")
 def sports():
-    return render_template("sports.html", title="Sports")
+    #add sources from api
+    sports_headlines = newsapi.get_top_headlines(sources='nhl-news')
+    #print(sports_headlines)
+    sports = sports_headlines['articles']
+    desc = []
+    aut = []
+    news = []
+    link = []
+    img = []
+
+    # ilitarate over the data in api with for loop
+    for i in range(len(sports)):
+        mysports = sports[i]
+
+        news.append(mysports['title'])
+        aut.append(mysports['author'])
+        desc.append(mysports['description'])
+        img.append(mysports['urlToImage'])
+        link.append(mysports['url'])
+
+        sportslist = zip(news, aut, desc, img, link)
+
+    return render_template("sports.html", context=sportslist, title="Sports")
 
 
 if __name__ == '__main__':

@@ -1,4 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
-      
+<div class="jumbotron">
+    <h1 class="display-1 text-center">
+        News Headlines
+    </h1>
+</div>
+<section class="container">
+    <h2 class="mb-4">Top headlines</h2>
+        <div class="row">
+            {% for new, aut, des, img, i in context %}
+              <div class="col-md-4">
+                <img class="img-fluid" src="{{ img }}" alt="">
+                <h4>{{ new }}</h4>
+                <small class="text-muted">{{ aut }}</small>
+                <p class="lead">{{ des }}</p>
+                <a class="btn btn-primary mb-4" target="blank" href="{{ i }}" role="button">Read More</a>
+        </div>
+            {% endfor %}
+        </div>
+</section>
 {% endblock content %}
